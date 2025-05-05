@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const EmployeeSchema = new mongoose.Schema({
     employeeId: { type: String, require: true },
-    role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role', required: true },
     salutation: { type: String, require: true },
     name: { type: String, require: true },
     email: { type: String, require: true },

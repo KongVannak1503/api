@@ -17,7 +17,7 @@ const deleteImageFile = (imagePath) => {
 
 exports.createEmployee = async (req, res) => {
     try {
-        const { employeeId, password, isActive, role, salutation, name, email, designation, department, city, phone, gender, dob, language, address, about, skill, rate, employeeType, maritalStatus, businessAddress } = req.body;
+        const { employeeId, password, isActive, salutation, name, email, designation, department, city, phone, gender, dob, language, address, about, skill, rate, employeeType, maritalStatus, businessAddress } = req.body;
 
         // if (!employeeId || !email || !password || !role) {
         //     return res.status(400).json({ message: "All required fields must be filled." });
@@ -27,7 +27,6 @@ exports.createEmployee = async (req, res) => {
         // Create a new employee record
         const newEmployee = new Employee({
             employeeId,
-            role,
             salutation,
             name,
             email,
@@ -76,7 +75,6 @@ exports.updateEmployee = async (req, res) => {
             // Prepare the update object with new values from the request body
             const updateData = {
                 employeeId: req.body.employeeId,
-                role: req.body.role,
                 salutation: req.body.salutation,
                 name: req.body.name,
                 email: req.body.email,
@@ -140,7 +138,6 @@ exports.getEmployees = async (req, res) => {
         const employees = await Employee.find()
             .populate('department', 'name')
             .populate('designation', 'name')
-            .populate('role', 'name')
             .sort({ updatedAt: -1 });
         res.json(employees);
     } catch (error) {
@@ -172,8 +169,7 @@ exports.viewEmployeeById = async (req, res) => {
         const { id } = req.params;
         const employee = await Employee.findById(id)
             .populate('department', 'name')
-            .populate('designation', 'name')
-            .populate('role', 'name')
+            .populate('designation', 'name');
 
 
         if (!employee) {
@@ -230,5 +226,29 @@ exports.checkEmailExists = async (req, res) => {
     } catch (error) {
         console.error('Error checking email:', error);
         return res.status(500).json({ error: 'Server error' });
+    }
+};
+
+
+exports.updateStatus = async (req, res) => {
+    try {
+        const { isActive } = req.body;
+
+        const { id } = req.params;
+
+        const updatedStatus = await Employee.findByIdAndUpdate(
+            id,
+            { isActive },
+            { new: true }
+        );
+
+        if (!updatedStatus) {
+            return res.status(404).json({ message: "Employee not found." });
+        }
+
+        res.status(200).json({ message: `Employee updated with status ${isActive}`, data: updatedStatus });
+    } catch (error) {
+        console.error("Error updating Employee status:", error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 };

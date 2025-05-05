@@ -43,17 +43,17 @@ exports.getJobs = async (req, res) => {
 
 exports.updateJob = async (req, res) => {
     try {
-        const { jobId } = req.params; // Get job ID from URL params
+        const { id } = req.params; // Get job ID from URL params
         const updateData = req.body; // Get job update data from request body
 
         // Check if job exists
-        const job = await Job.findById(jobId);
+        const job = await Job.findById(id);
         if (!job) {
             return res.status(404).json({ message: "Job not found" });
         }
 
         // Update the job
-        const updatedJob = await Job.findByIdAndUpdate(jobId, updateData, { new: true });
+        const updatedJob = await Job.findByIdAndUpdate(id, updateData, { new: true });
 
         res.json({
             message: "Job updated successfully",
@@ -76,6 +76,21 @@ exports.viewJob = async (req, res) => {
             .populate('skillId', 'name')
             .populate('interviewId', 'name')
             .populate('employeeId', 'name');
+
+        if (!job) {
+            return res.status(404).json({ message: "Job Application not found." });
+        }
+
+        res.status(200).json({ data: job });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+exports.viewJobUpdate = async (req, res) => {
+    try {
+        const { id } = req.params; // Get ID from request parameters
+        const job = await Job.findById(id);
 
         if (!job) {
             return res.status(404).json({ message: "Job Application not found." });

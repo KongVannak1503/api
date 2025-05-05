@@ -111,7 +111,6 @@ exports.updateStatus = async (req, res) => {
 exports.updateStatuses = async (req, res) => {
     try {
         const { ids, isActive } = req.body;
-        console.log("hello")
 
         // Validate the input
         if (!Array.isArray(ids) || ids.length === 0 || typeof isActive !== 'boolean') {

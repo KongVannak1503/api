@@ -15,5 +15,6 @@ router.put('/:id', checkPermission, employeeController.updateEmployee);
 router.delete('/:id', checkPermission, employeeController.deleteEmployee);
 router.get('/check/:id', checkPermission, employeeController.checkIdExists);
 router.get('/check/:email', checkPermission, employeeController.checkEmailExists);
+router.put('/status/:id', employeeController.updateStatus);
 
 module.exports = router;

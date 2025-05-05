@@ -86,29 +86,22 @@ exports.deleteJobPosition = async (req, res) => {
     }
 };
 
-
 exports.updateJobPositionStatus = async (req, res) => {
     try {
-        const { status } = req.body;
-        const { id } = req.params; // Get ID from request parameters
+        const { isActive } = req.body;
 
-        // Check if the status is provided
-        if (!id) {
-            return res.status(400).json({ message: "Status must be provided." });
-        }
+        const { id } = req.params;
 
-        // Find and update the Job document
-        const updatedJob = await JobPosition.findByIdAndUpdate(
+        const updatedStatus = await JobPosition.findByIdAndUpdate(
             id,
-            { status }, // Update only the status field
-            { new: true } // Return the updated document
+            { isActive },
+            { new: true }
         );
 
-        if (!updatedJob) {
-            return res.status(404).json({ message: "Job position not found." });
+        if (!updatedStatus) {
+            return res.status(404).json({ message: "Designation not found." });
         }
-
-        res.status(200).json({ message: `Job updated with status ${status}`, data: updatedJob });
+        res.status(200).json({ message: `Job updated with status `, data: updatedStatus });
     } catch (error) {
         console.error("Error updating job status:", error);
         res.status(500).json({ message: "Internal Server Error" });

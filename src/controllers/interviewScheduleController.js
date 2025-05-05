@@ -1,4 +1,5 @@
 const Schedule = require('../models/interviewScheduleModel');
+const { updateJob } = require('./jobController');
 
 exports.createSchedule = async (req, res) => {
     try {
@@ -25,7 +26,6 @@ exports.getSchedules = async (req, res) => {
         const schedule = await Schedule.find()
             .populate('jobId', 'name')
             .populate('roundId', 'name')
-            .populate('interviewId', 'name')
             .populate('employeeId', 'imgUrl')
             .populate('interviewId', 'name')
             .populate({
@@ -42,17 +42,17 @@ exports.getSchedules = async (req, res) => {
 
 exports.updateSchedule = async (req, res) => {
     try {
-        const { scheduleId } = req.params;
+        const { id } = req.params;
         const updateData = req.body;
-        const schedule = await Schedule.findById(scheduleId);
+        const schedule = await Schedule.findById(id);
         if (!schedule) {
-            return res.status(404).json({ message: "Job not found" });
+            return res.status(404).json({ message: "Interview not found" });
         }
-        const updatedJob = await Job.findByIdAndUpdate(scheduleId, updateData, { new: true });
+        const updatedSchedule = await Schedule.findByIdAndUpdate(id, updateData, { new: true }).populate('interviewId', 'name');
 
         res.json({
-            message: "Job updated successfully",
-            data: updatedJob,
+            message: "Interview updated successfully",
+            data: updatedSchedule,
         });
     } catch (error) {
         console.error("Error updating job:", error);
@@ -67,9 +67,24 @@ exports.viewSchedule = async (req, res) => {
             .populate('categoryId', 'name')
             .populate('subCategoryId', 'name')
             .populate('departmentId', 'name')
-            .populate('skillId', 'name')
             .populate('interviewId', 'name')
             .populate('employeeId', 'name');
+
+        if (!schedule) {
+            return res.status(404).json({ message: "Job  not found." });
+        }
+
+        res.status(200).json({ data: schedule });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+exports.viewScheduleUpdate = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const schedule = await Schedule.findById(id);
 
         if (!schedule) {
             return res.status(404).json({ message: "Job  not found." });
@@ -108,7 +123,7 @@ exports.updateScheduleStatus = async (req, res) => {
         }
 
         // Find and update the Job document
-        const updatedJob = await Job.findByIdAndUpdate(
+        const updatedJob = await Schedule.findByIdAndUpdate(
             id,
             { status },
             { new: true }
